@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+		
+	<import resource="classpath:job-context.xml" />
+	
+	<context:property-placeholder location="classpath:activity-job.properties" />
+		
+	<job id="activityDateJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="activityDateStep">
+			<tasklet>
+				<chunk 
+					reader="torrentsReader"
+					processor="activityDateProcessor"
+					writer="exhaustedTorrentsWriter"
+					commit-interval="5"
+				/>
+			</tasklet>
+		</step>
+	</job>
+	
+	<bean id="torrentsReader" class="fr.thedestiny.torrent.reader.TorrentsReader">
+		<property name="transmissionConnector" ref="transmissionConnector" />
+	</bean>
+	
+	<bean id="activityDateProcessor" class="fr.thedestiny.torrent.processor.ActivityDateProcessor">
+		<property name="maximumAllowedIdleTime" value="${maximumAllowedIdleTime}" />
+	</bean>
+	
+ 	<bean id="exhaustedTorrentsWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+ 		<property name="encoding" value="UTF-8" />
+ 		<property name="resource" value="file:${outputFile}" />
+ 		<property name="lineAggregator">
+ 			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator"/>
+ 		</property>
+ 	</bean>	
+	
+	<bean id="transmissionConnector" class="fr.thedestiny.torrent.util.transmission.TransmissionConnector">
+		<constructor-arg name="addr" value="${transmissionAddr}"/>
+		<constructor-arg name="port" value="${transmissionPort}"/>
+		<property name="objectMapper" ref="objectMapper"/>
+	</bean>
+	
+	
+</beans>

@@ -62,7 +62,12 @@ public class TransmissionConnector {
 		request.addArgument("fields").addValue("id")
 									.addValue("name")
 									.addValue("activityDate")
-									.addValue("status");
+									.addValue("status")
+									.addValue("uploadRatio")
+									.addValue("uploadedEver")
+									.addValue("totalSize")
+									.addValue("leftUntilDone")
+									.addValue("hashString");
 		
 		return postRequest(request, TorrentListingResponse.class);
 	}

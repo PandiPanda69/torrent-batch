@@ -15,9 +15,9 @@ import fr.thedestiny.torrent.bean.TorrentBean;
 import fr.thedestiny.torrent.util.transmission.mapping.TorrentListingResponse.Torrent;
 
 /**
- * Writer permettant de persister en base de données les statistics 
- * des torrents {@link Torrent} en entrée.
- * @author Sébastien
+ * Writer permettant de persister en base de donnï¿½es les statistics 
+ * des torrents {@link Torrent} en entrï¿½e.
+ * @author Sï¿½bastien
  */
 public class TorrentStatisticsWriter implements ItemWriter<Torrent> {	
 	
@@ -42,13 +42,13 @@ public class TorrentStatisticsWriter implements ItemWriter<Torrent> {
 		try {
 		
 			/*
-			 * Pour chacun des torrents à traiter
-			 * 	- On vérifie s'il est déjà persisté
+			 * Pour chacun des torrents ï¿½ traiter
+			 * 	- On vï¿½rifie s'il est dï¿½jï¿½ persistï¿½
 			 * 		- Si non on le persiste
-			 * 		- Si oui on vérifie que celui en base et celui remonté par RPC
-			 * 			sont identiques (taille et statut) et on met à jour la base
-			 * 			le cas échéant.
-			 * 	- On insère ses statistiques
+			 * 		- Si oui on vï¿½rifie que celui en base et celui remontï¿½ par RPC
+			 * 			sont identiques (taille et statut) et on met ï¿½ jour la base
+			 * 			le cas ï¿½chï¿½ant.
+			 * 	- On insï¿½re ses statistiques
 			 * 	
 			 */
 			for(Torrent current : in) {
@@ -82,37 +82,38 @@ public class TorrentStatisticsWriter implements ItemWriter<Torrent> {
 	
 	/**
 	 * 
-	 * @param hash HashString du torrent à rechercher
+	 * @param hash HashString du torrent ï¿½ rechercher
 	 * @param session La session courante
-	 * @return Instance du bean mappé à la BDD
+	 * @return Instance du bean mappï¿½ ï¿½ la BDD
 	 */
 	private TorrentBean getTorrentFromDatabase(String hash, Session session) {
 		
-		Query query = session.createSQLQuery("SELECT id, name, hash, downloadedBytes, status FROM Torrent WHERE hash like :hash").setParameter("hash", hash);
+		Query query = session.createSQLQuery("SELECT id, name, hash, downloadedBytes, status, trackerError FROM Torrent WHERE hash like :hash").setParameter("hash", hash);
 		TorrentBean torrent = (TorrentBean) query.setResultTransformer(Transformers.aliasToBean(TorrentBean.class)).uniqueResult();
 		
 		return torrent;
 	}
 	
 	/**
-	 * Persiste un nouveau torrent en base de données.
-	 * @param torrent Le torrent récupéré via un appel RPC à Transmission
+	 * Persiste un nouveau torrent en base de donnï¿½es.
+	 * @param torrent Le torrent rï¿½cupï¿½rï¿½ via un appel RPC ï¿½ Transmission
 	 * @param session La session courante
 	 */
 	private void insertTorrentInDatabase(Torrent torrent, Session session) {
 		
-		Query query = session.createSQLQuery("INSERT INTO Torrent(name, hash, downloadedBytes, status) VALUES(:name, :hash, :downloadedBytes, 'ACTIVE')")
+		Query query = session.createSQLQuery("INSERT INTO Torrent(name, hash, downloadedBytes, status, trackerError) VALUES(:name, :hash, :downloadedBytes, 'ACTIVE', :trackerError)")
 				.setParameter("name", torrent.getName())
 				.setParameter("hash", torrent.getHashString())
-				.setParameter("downloadedBytes", torrent.getSize());
+				.setParameter("downloadedBytes", torrent.getSize())
+				.setParameter("trackerError", torrent.getErrorString());
 		
 		query.executeUpdate();		
 	}
 	
 	/**
-	 * Insère les statistiques d'un torrent en base de données
-	 * @param torrentId Identifiant du torrent de référence persisté en base
-	 * @param uploadedBytes Quantité d'octets partagés à ce jour
+	 * Insï¿½re les statistiques d'un torrent en base de donnï¿½es
+	 * @param torrentId Identifiant du torrent de rï¿½fï¿½rence persistï¿½ en base
+	 * @param uploadedBytes Quantitï¿½ d'octets partagï¿½s ï¿½ ce jour
 	 * @param session La session courante
 	 */
 	private void insertTorrentStatistics(Integer torrentId, Long uploadedBytes, Session session) {
@@ -125,28 +126,33 @@ public class TorrentStatisticsWriter implements ItemWriter<Torrent> {
 	}
 	
 	/**
-	 * Détermine si le torrent en base est différent aux informations remontées par l'appel
-	 * RPC à Transmission
-	 * @param current Le torrent récupéré via un appel RPC à Transmission
+	 * DÃ©termine si le torrent en base est diffÃ©rent aux informations remontÃ©es par l'appel
+	 * RPC Ã  Transmission
+	 * @param current Le torrent rÃ©cupÃ©rÃ© via un appel RPC Ã  Transmission
 	 * @param bean Le torrent actuellement en base
-	 * @return Vrai si le torrent est différent, faux le cas contraire
+	 * @return Vrai si le torrent est diffÃ©rent, faux le cas contraire
 	 */
 	private boolean hasTorrentChanged(Torrent current, TorrentBean bean) {
 		
-		return (!bean.getStatus().equals("ACTIVE")) || (!current.getSize().equals(Long.valueOf(bean.getDownloadedBytes())));
+		return (
+				!bean.getStatus().equals("ACTIVE")) || 
+				(!current.getSize().equals(Long.valueOf(bean.getDownloadedBytes())) || 
+				(!current.getErrorString().equals(bean.getTrackerError()))
+		);
 	}
 	
 	/**
-	 * Met à jour le torrent au cas où celui en base contient des informations obsolètes.
-	 * @param current Le torrent récupéré via un appel RPC à Transmission
+	 * Met Ã  jour le torrent au cas oÃ¹ celui en base contient des informations obsolÃ¨tes.
+	 * @param current Le torrent rÃ©cupÃ©rÃ© via un appel RPC Ã  Transmission
 	 * @param bean Le torrent actuellement en base
 	 * @param session La session en cours
 	 */
 	private void updateTorrent(Torrent current, TorrentBean bean, Session session) {
 		
-		Query query = session.createSQLQuery("UPDATE Torrent SET status = 'ACTIVE', downloadedBytes = :downloadedBytes WHERE id = :id")
+		Query query = session.createSQLQuery("UPDATE Torrent SET status = 'ACTIVE', downloadedBytes = :downloadedBytes, trackerError = :trackerError WHERE id = :id")
 				.setParameter("downloadedBytes", current.getSize())
-				.setParameter("id", bean.getId());
+				.setParameter("id", bean.getId())
+				.setParameter("trackerError", current.getErrorString());
 		
 		query.executeUpdate();
 	}

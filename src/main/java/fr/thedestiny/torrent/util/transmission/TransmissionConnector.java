@@ -18,7 +18,7 @@ import fr.thedestiny.torrent.util.transmission.request.TransmissionRequest;
 
 /**
  * Communication avec transmission via des appels RPC
- * @author Sébastien
+ * @author Sï¿½bastien
  */
 public class TransmissionConnector {
 
@@ -50,8 +50,8 @@ public class TransmissionConnector {
 	}
 	
 	/**
-	 * Récupération de la liste des torrents
-	 * @return Objet mappé
+	 * Rï¿½cupï¿½ration de la liste des torrents
+	 * @return Objet mappï¿½
 	 * @throws IOException
 	 * @throws TransmissionRequestStringifyFailed
 	 */
@@ -67,13 +67,14 @@ public class TransmissionConnector {
 									.addValue("uploadedEver")
 									.addValue("totalSize")
 									.addValue("leftUntilDone")
+									.addValue("errorString")
 									.addValue("hashString");
 		
 		return postRequest(request, TorrentListingResponse.class);
 	}
 	
 	/**
-	 * Met à jour le sessionId permettant d'interroger Transmission
+	 * Met ï¿½ jour le sessionId permettant d'interroger Transmission
 	 * @throws IOException Impossible d'ouvrir l'URL
 	 */
 	public void refreshSessionId() throws IOException {
@@ -87,25 +88,25 @@ public class TransmissionConnector {
 			// Rien
 		}
 		
-		// Récupération du sessionId dans l'en-tête de la requête
+		// Rï¿½cupï¿½ration du sessionId dans l'en-tï¿½te de la requï¿½te
 		sessionId = connection.getHeaderField(TRANSMISSION_SESSION_ID_HEADER_FIELD);
 	}
 	
 	/**
-	 * Envoi une requête POST à Transmission
-	 * @param request Contenu de la requête à envoyer
-	 * @return La réponse mappée
+	 * Envoi une requï¿½te POST ï¿½ Transmission
+	 * @param request Contenu de la requï¿½te ï¿½ envoyer
+	 * @return La rï¿½ponse mappï¿½e
 	 * @throws IOException
 	 * @throws TransmissionRequestStringifyFailed
 	 */
 	private <T> T postRequest(TransmissionRequest request, Class<T> clazz) throws IOException, TransmissionRequestStringifyFailed {
 		
-		// Si le sessionId n'a pas encore été déterminé
+		// Si le sessionId n'a pas encore ï¿½tï¿½ dï¿½terminï¿½
 		if(sessionId == null) {
 			refreshSessionId();
 		}
 		
-		// Stringify de la requête
+		// Stringify de la requï¿½te
 		String jsonRequest = request.toString();
 		if(jsonRequest == null) {
 			throw new TransmissionRequestStringifyFailed();
@@ -128,7 +129,7 @@ public class TransmissionConnector {
 
 		writer.close();
 
-		// Lecture de la réponse
+		// Lecture de la rï¿½ponse
 		String content = null;
 		try {
 			content = this.getUrlContent(connection.getInputStream());
@@ -141,9 +142,9 @@ public class TransmissionConnector {
 	}
 	
 	/**
-	 * Lecture de la réponse d'une requête
-	 * @param in Flux à lire
-	 * @return La réponse sous forme d'une chaîne de caractère
+	 * Lecture de la rï¿½ponse d'une requï¿½te
+	 * @param in Flux ï¿½ lire
+	 * @return La rï¿½ponse sous forme d'une chaï¿½ne de caractï¿½re
 	 * @throws IOException
 	 */
 	private String getUrlContent(InputStream in) throws IOException {

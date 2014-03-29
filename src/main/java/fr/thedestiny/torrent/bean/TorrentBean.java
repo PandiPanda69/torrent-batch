@@ -4,7 +4,7 @@ import lombok.Data;
 
 /**
  * Bean used for database binding
- * @author Sébastien
+ * @author SÃ©bastien
  */
 @Data
 public class TorrentBean {
@@ -14,4 +14,5 @@ public class TorrentBean {
 	private String hash;
 	private String downloadedBytes;
 	private String status;
+	private String trackerError;
 }

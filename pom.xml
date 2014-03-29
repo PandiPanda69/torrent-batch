@@ -4,7 +4,7 @@
 	<groupId>fr.thedestiny.torrent</groupId>
 	<artifactId>torrent-batch</artifactId>
 	<packaging>jar</packaging>
-	<version>1.1</version>
+	<version>1.2</version>
 
 	<properties>
 		<spring.batch.version>2.2.0.RELEASE</spring.batch.version>
@@ -88,17 +88,45 @@
 					</excludes>
 				</configuration>
 			</plugin>
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-dependency-plugin</artifactId> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>copy-dependencies</id> -->
+<!-- 						<phase>package</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>copy-dependencies</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<outputDirectory>${project.build.directory}/lib</outputDirectory> -->
+<!-- 							<overWriteReleases>false</overWriteReleases> -->
+<!-- 							<overWriteSnapshots>false</overWriteSnapshots> -->
+<!-- 							<overWriteIfNewer>true</overWriteIfNewer> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
+			
 			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+							<target>
+								<copy todir="${project.build.directory}/lib" overwrite="true" verbose="true">
+									<fileset dir="${project.build.directory}" includes="*.jar" />
+								</copy>
+								<zip destfile="${project.build.directory}/batch-lib.zip"
+									basedir="${project.build.directory}" includes="**" />
+							</target>
 						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>

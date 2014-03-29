@@ -5,15 +5,15 @@ import org.springframework.batch.item.ItemProcessor;
 import fr.thedestiny.torrent.util.transmission.mapping.TorrentListingResponse.Torrent;
 
 /**
- * Processeur qui vérifie que le torrent est bien en seed et élimine les autres.
- * @author Sébastien
+ * Processeur qui vï¿½rifie que le torrent est bien en seed et ï¿½limine les autres.
+ * @author Sï¿½bastien
  */
 public class StatisticsProcessor implements ItemProcessor<Torrent, Torrent>{
 
 	@Override
 	public Torrent process(Torrent in) throws Exception {
 
-		if(in.isSeeding()) {
+		if(in.isSeeding() || in.isFinished()) {
 			return in;
 		}
 		

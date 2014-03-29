@@ -9,8 +9,8 @@ import lombok.Data;
 import fr.thedestiny.torrent.util.transmission.request.TransmissionResponse;
 
 /**
- * Dto mappant la réponse reçu après demande de la liste des torrents via RPC
- * @author Sébastien
+ * Dto mappant la rÃ©ponse reÃ§u aprÃ¨s demande de la liste des torrents via RPC
+ * @author SÃ©bastien
  *
  */
 public class TorrentListingResponse extends TransmissionResponse<TorrentListingResponse.Torrent> {
@@ -33,6 +33,8 @@ public class TorrentListingResponse extends TransmissionResponse<TorrentListingR
 		
 		private Long uploadedEver;
 		
+		private String errorString;
+		
 		@Getter(AccessLevel.NONE)
 		private Long totalSize;
 		
@@ -41,6 +43,10 @@ public class TorrentListingResponse extends TransmissionResponse<TorrentListingR
 		
 		public boolean isSeeding() {
 			return status.equals(6);
+		}
+		
+		public boolean isFinished() {
+			return status.equals(0);
 		}
 		
 		public Long getSize() {

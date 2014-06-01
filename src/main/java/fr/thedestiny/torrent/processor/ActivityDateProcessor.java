@@ -7,8 +7,8 @@ import org.springframework.batch.item.ItemProcessor;
 import fr.thedestiny.torrent.util.transmission.mapping.TorrentListingResponse.Torrent;
 
 /**
- * Processeur chargé de vérifier qu'un torrent n'a pas été actif depuis plus de X jours.
- * @author Sébastien
+ * Processeur chargÃ© de vÃ©rifier qu'un torrent n'a pas Ã©tÃ© actif depuis plus de X jours.
+ * @author SÃ©bastien
  */
 public class ActivityDateProcessor implements ItemProcessor<Torrent, Torrent> {
 

@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 
 /**
  * 
- * @author Sébastien
+ * @author SÃ©bastien
  */
 public class TransmissionRequestArgument {
 
@@ -31,8 +31,8 @@ public class TransmissionRequestArgument {
 	}
 	
 	/**
-	 * Ajoute une valeur à l'argument (méthode chaînable)
-	 * @param value Valeur à ajouter
+	 * Ajoute une valeur Ã  l'argument (mÃ©thode chaÃ®nable)
+	 * @param value Valeur Ã  ajouter
 	 * @return Instance courante
 	 */
 	public TransmissionRequestArgument addValue(String value) {

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+		
+	<import resource="classpath:job-context.xml" />
+	
+	<context:property-placeholder location="classpath:queue-job.properties" />
+		
+	<job id="queueJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="initStep" next="queueStep">
+			<tasklet ref="initTasklet" />
+		</step>
+		<step id="queueStep">
+			<tasklet>
+				<chunk 
+					reader="queueReader"
+					processor="queueProcessor"
+					writer="queueWriter"
+					commit-interval="5"
+				/>
+			</tasklet>
+		</step>
+	</job>
+	
+	<bean id="currentTorrentQueue" class="java.util.ArrayList" />
+	
+	<bean id="initTasklet" class="fr.thedestiny.torrent.tasklet.ExistingTorrentQueueTasklet">
+		<property name="currentTorrentQueue" ref="currentTorrentQueue" />
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<bean id="queueReader" class="fr.thedestiny.torrent.reader.TorrentQueueReader">
+		<property name="queuePath" value="${queue.path}" />
+		<property name="filePattern" value="${queue.pattern}" />
+	</bean>
+	
+	<bean id="queueProcessor" class="fr.thedestiny.torrent.processor.TorrentQueueProcessor">
+		<property name="currentTorrentQueue" ref="currentTorrentQueue" />
+	</bean>		
+	
+ 	<bean id="queueWriter" class="fr.thedestiny.torrent.writer.TorrentQueueWriter">
+ 		<property name="sessionFactory" ref="sessionFactory" />
+ 		<property name="queuePath" value="${queue.path}" />
+ 	</bean>	
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+  		<property name="driverClassName" value="${database.driver}" />
+  		<property name="url" value="${database.url}" />
+  	</bean>
+	
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+			</props>
+		</property>
+	</bean>
+	
+</beans>

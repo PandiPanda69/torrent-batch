@@ -6,3 +6,7 @@
 *.ear
 /target
 /exhausted_torrents.txt
+/.settings
+/.classpath
+/.project
+/torrent.db

@@ -14,8 +14,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import fr.thedestiny.torrent.util.transmission.exception.TransmissionRequestArgumentNotFound;
 
 /**
- * Classe modélisant une requête vers transmission
- * @author Sébastien
+ * Classe modÃ©lisant une requÃªte vers transmission
+ * @author SÃ©bastien
  */
 public class TransmissionRequest {
 
@@ -44,14 +44,14 @@ public class TransmissionRequest {
 	
 	/**
 	 * Ajoute un nouvel argument
-	 * @param name Nom de l'argument à ajouter
+	 * @param name Nom de l'argument Ã  ajouter
 	 * @return L'instance du nouvel argument
 	 */
 	public TransmissionRequestArgument addArgument(String name) {
 		
 		TransmissionRequestArgument theArg = null;
 		
-		// Essaie de récupérer l'argument, sinon l'ajoute (ça évite les doublons)
+		// Essaie de rÃ©cupÃ©rer l'argument, sinon l'ajoute (Ã§a Ã©vite les doublons)
 		try {
 			theArg = getArgument(name);
 		} catch(TransmissionRequestArgumentNotFound ex) {
@@ -64,8 +64,8 @@ public class TransmissionRequest {
 	
 	/**
 	 * Retourne l'argument ayant le nom <em>name</em>.
-	 * @param name Nom de l'argument à récupérer
-	 * @return L'argument souhaité
+	 * @param name Nom de l'argument Ã  rÃ©cupÃ©rer
+	 * @return L'argument souhaitÃ©
 	 * @throws TransmissionRequestArgumentNotFound
 	 */
 	public TransmissionRequestArgument getArgument(String name) throws TransmissionRequestArgumentNotFound {
@@ -84,7 +84,7 @@ public class TransmissionRequest {
 		
 		request.put(METHOD_FIELD, method);
 		
-		// S'il y a des arguments, on les ajoute un à un à la requête
+		// S'il y a des arguments, on les ajoute un Ã  un Ã  la requÃªte
 		if(arguments.size() > 0) {
 			Map<String, List<String>> requestArgs = new HashMap<String, List<String>>();
 			
@@ -97,7 +97,7 @@ public class TransmissionRequest {
 			request.put(ARGS_FIELD, "");
 		}
 		
-		// Génération du JSON et retour du résultat, sinon on retourne NULL avec une trace
+		// GÃ©nÃ©ration du JSON et retour du rÃ©sultat, sinon on retourne NULL avec une trace
 		try {
 			return objectMapper.writeValueAsString(request);
 		}
